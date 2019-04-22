@@ -1,3 +1,4 @@
+###
 POST http://localhost:8080/api/register
 Content-Type: application/json
 
@@ -13,5 +14,9 @@ Content-Type: application/json
   "name": "GT",
   "password": 123456
 }
+
+###
+GET http://localhost:8080/api/login
+Authorization: 9fc22948503d50a1e9672ca6d366aa961ec9e40ce0af28efd0ee10da938d48962dda35d1245e683dfac72fea7b73d3c8
 
 ###

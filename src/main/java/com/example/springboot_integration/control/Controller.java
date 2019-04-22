@@ -22,6 +22,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api")
 public class Controller {
+    private Map<String, User> users = new HashMap<>();
+
     @Autowired
     private Encryptor encrypt;
 
@@ -33,17 +35,19 @@ public class Controller {
 
     @Autowired
     private AddressService as;
+
     @PostMapping("/register")
     public Map register(@RequestBody User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.addUser(user);
         return Map.of("user", user);
     }
+
     @PostMapping("/login")
     public void login(@RequestBody User user, HttpServletResponse response) {
         Optional.ofNullable(userService.getUser(user.getName()))
                 .or(() -> {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "用户名或密码错误");
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "用户不存在");
                 })
                 .ifPresent(u -> {
                     if (!passwordEncoder.matches(user.getPassword(), u.getPassword())) {
@@ -56,6 +60,7 @@ public class Controller {
                     response.setHeader("Authorization", token);
                 });
     }
+
     @PostMapping("/users/{uid}/addresses")
     public Map postAddress(@RequestBody Address address, @RequestAttribute int uid) {
         address.setUser(new User(uid));
@@ -71,5 +76,11 @@ public class Controller {
     @PatchMapping("/users/{uid}/addresses/{aid}")
     public Map patchAddress(@RequestBody Address address) {
         return Map.of("address", as.updateAddress(address));
+    }
+
+    @GetMapping("/index")
+    public Map getIndex(@RequestAttribute String name) {
+        log.debug(name);
+        return Map.of("用户名：", name);
     }
 }
